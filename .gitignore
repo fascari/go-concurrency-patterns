@@ -1,0 +1,33 @@
+# Binaries
+*.exe
+*.out
+bin/
+.bin/
+concurrency
+build/
+
+# Test cache and coverage
+*.test
+coverage.out
+coverage.html
+
+# Go workspace (only for workspace projects)
+go.work
+go.work.sum
+
+# Local env
+.env
+.env.local
+*.local
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# copier answers (uncomment to track template version)
+# !.copier-answers.yml
