@@ -1,16 +1,18 @@
 package store
 
-import "testing"
+import (
+	"testing"
 
-func TestStoreSetGetLen(t *testing.T) {
+	"github.com/stretchr/testify/require"
+)
+
+func TestStore_ShouldSetGetAndCountEntries(t *testing.T) {
 	s := New[int]()
 	s.Set("a", 1)
 	s.Set("b", 2)
 
-	if got, ok := s.Get("a"); !ok || got != 1 {
-		t.Fatalf("Get(a): got=%d ok=%v", got, ok)
-	}
-	if got := s.Len(); got != 2 {
-		t.Fatalf("Len: got=%d want=2", got)
-	}
+	got, ok := s.Get("a")
+	require.True(t, ok)
+	require.Equal(t, 1, got)
+	require.Equal(t, 2, s.Len())
 }

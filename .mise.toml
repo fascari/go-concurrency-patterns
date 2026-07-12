@@ -8,8 +8,8 @@ GOWORK = "off"
 _.file = ".env"
 
 [tasks.test]
-description = "Run unit tests"
-run = "go test -v ./..."
+description = "Run unit tests with the race detector"
+run = "go test -race -v ./..."
 
 [tasks.lint]
 description = "Run linter"
@@ -20,8 +20,12 @@ description = "Tidy dependencies in every workspace module"
 run = "go mod tidy"
 
 [tasks.build]
-description = "Build the application"
-run = "go build -o bin/app ./cmd/api"
+description = "Build the dispatcher CLI"
+run = "go build -o bin/concurrency ./cmd/concurrency"
+
+[tasks.pattern]
+description = "Build and run a concurrency pattern (usage: mise run pattern <name>)"
+run = "go run ./cmd/concurrency --pattern"
 
 [tasks.fmt]
 description = "Format code"

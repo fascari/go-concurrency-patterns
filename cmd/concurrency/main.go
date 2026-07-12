@@ -1,5 +1,3 @@
-// Command concurrency dispatches one scenario by --pattern flag.
-// Example: go run ./cmd/concurrency --pattern goroutines
 package main
 
 import (
@@ -7,6 +5,7 @@ import (
 	"flag"
 	"log"
 
+	"github.com/fascari/go-concurrency-patterns/internal/goroutines"
 )
 
 func main() {
@@ -18,8 +17,16 @@ func main() {
 	}
 
 	ctx := context.Background()
-	_ = ctx
 	switch *pattern {
+	case "goroutines":
+		res, err := goroutines.Run(ctx, goroutines.Params{
+			Input:     []int64{1, 2, 3, 4, 5, 6, 7, 8},
+			UseModern: true,
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("sum=%d", res.Sum)
 	default:
 		log.Fatalf("unknown pattern: %q", *pattern)
 	}
