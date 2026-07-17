@@ -1,11 +1,8 @@
 [tools]
 go = "1.26.1"
-atlas = "latest"
-
 
 [env]
 GOWORK = "off"
-_.file = ".env"
 
 [tasks.test]
 description = "Run unit tests with the race detector"
@@ -15,76 +12,6 @@ run = "go test -race -v ./..."
 description = "Run linter"
 run = "golangci-lint run"
 
-[tasks.tidy]
-description = "Tidy dependencies in every workspace module"
-run = "go mod tidy"
-
-[tasks.build]
-description = "Build the dispatcher CLI"
-run = "go build -o bin/concurrency ./cmd/concurrency"
-
 [tasks.pattern]
-description = "Build and run a concurrency pattern (usage: mise run pattern <name>)"
+description = "Run a concurrency pattern (usage: mise run pattern <name>)"
 run = "go run ./cmd/concurrency --pattern"
-
-[tasks.fmt]
-description = "Format code"
-run = "go fmt ./..."
-
-
-[tasks."db:up"]
-description = "Start only postgres container"
-run = "docker compose up -d postgres"
-
-[tasks."wait:postgres"]
-description = "Wait for PostgreSQL to accept connections"
-run = """
-until docker compose exec -T postgres pg_isready -U go-concurrency-patterns_user 2>/dev/null; do
-  echo "Waiting for PostgreSQL..."
-  sleep 2
-done
-"""
-
-[tasks."db:migrate"]
-description = "Apply all pending migrations"
-depends = ["wait:postgres"]
-run = "atlas migrate apply --env local"
-
-[tasks."db:status"]
-description = "Show migration status"
-run = "atlas migrate status --env local"
-
-[tasks."db:diff"]
-description = "Generate a new migration (usage: mise run db:diff <name>)"
-run = """
-NAME="${1:-new_migration}"
-atlas migrate diff "$NAME" --env local
-"""
-
-[tasks."db:reset"]
-description = "Drop and recreate PostgreSQL data, then re-apply migrations"
-run = """
-docker compose stop postgres
-docker compose rm -f postgres
-docker volume rm go-concurrency-patterns_postgres_data 2>/dev/null || true
-docker compose up -d postgres
-mise run db:migrate
-"""
-
-
-[tasks."integration"]
-description = "Run integration tests (requires Docker)"
-run = "go test -tags=integration -v ./internal/testing/..."
-
-[tasks."e2e:up"]
-description = "Start postgres for integration tests (port 25432)"
-run = "docker compose -f docker-compose.e2e.yml up -d"
-
-[tasks."e2e:down"]
-description = "Stop integration test infrastructure"
-run = "docker compose -f docker-compose.e2e.yml down"
-
-
-[tasks.mocks]
-description = "Generate mocks"
-run = "mockery"
