@@ -1,3 +1,5 @@
+//go:build unprotected
+
 package unprotected
 
 import (

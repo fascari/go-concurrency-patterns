@@ -14,7 +14,7 @@ Unit 2 uses a small in-memory balance store to show how `sync.RWMutex` protects 
 
 The first call to `sync.Once.Do` creates the map, concurrent callers wait for that initialization, and later calls use the completed fast path (`store.go:69-73`), while the memory guarantee provided by `Once` makes the initialized map visible before any waiting call returns. The concurrent zero-value test writes 1,000 distinct keys through one uninitialized `Store`, and the separate `sync.Once` test confirms that an initializer runs exactly once even when 1,000 goroutines call it.
 
-All `Store` methods use pointer receivers, which avoids copying the `sync.RWMutex` and `sync.Once` during ordinary calls, because copying an initialized store would split its synchronization state while both map headers could still refer to the same backing map. The smaller fixture under `testdata/mutexcopy` copies a struct containing `sync.Mutex` and a preallocated map so `go vet` reports the assignment, although the fixture itself only locks the copy and doesn't start a concurrent access through the original value.
+All `Store` methods use pointer receivers, which avoids copying the `sync.RWMutex` and `sync.Once` during ordinary calls, because copying an initialized store would split its synchronization state while both map headers could still refer to the same backing map. The smaller fixture under `internal/mutex/mutexcopy` copies a struct containing `sync.Mutex` and a preallocated map so `go vet` reports the assignment, although the fixture itself only locks the copy and doesn't start a concurrent access through the original value.
 
 ### 2. Lock scope and transfer atomicity
 
@@ -38,7 +38,7 @@ When a writer calls `Lock` while readers hold the mutex, new `RLock` calls wait 
 
 The production tests cover constructor and zero-value initialization, a successful transfer, every declared transfer error, concurrent transfers, concurrent initialization, and direct `sync.Once` behavior. The concurrent transfer test launches 1,000 transfers that alternate direction, expects every call to succeed, and verifies both exact account balances and the preserved total, so it exercises the multi-account invariant under contention rather than checking only for a missing data race.
 
-Running the production package with the race detector passes, and ordinary `go vet` reports no issue, while the intentionally unsafe packages stay under `testdata` so recursive package discovery doesn't include them in a normal `./internal/mutex/...` run.
+Running the production package with the race detector passes, and ordinary `go vet` reports no issue, while the intentionally unsafe packages stay behind build tags so recursive package discovery doesn't include them in a normal `./internal/mutex/...` run.
 
 ### 6. Benchmark scope and result
 
@@ -71,8 +71,8 @@ go vet ./internal/mutex
 The fixture checks fail on purpose when invoked directly:
 
 ```bash
-go test -race -count=1 ./internal/mutex/testdata/unprotected
-go vet ./internal/mutex/testdata/mutexcopy
+go test -race -count=1 -tags unprotected ./internal/mutex/unprotected
+go vet -tags mutexcopy ./internal/mutex/mutexcopy
 ```
 
 The unprotected fixture starts one `Put` and one `Load` together, which makes the race detector report concurrent map access, while the copied-lock fixture makes `go vet` report the assignment that copies a value containing `sync.Mutex`. The race detector can only report conflicts reached during execution, whereas `go vet` examines source patterns without needing the copied-lock path to produce a runtime race, so the two tools cover different failure modes.

@@ -1,8 +1,12 @@
+//go:build unprotected
+
 package unprotected
 
-type Store struct {
-	balances map[string]int64
-}
+type (
+	Store struct {
+		balances map[string]int64
+	}
+)
 
 func New() *Store {
 	return new(Store{
