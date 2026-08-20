@@ -3,7 +3,6 @@
 *.out
 bin/
 .bin/
-concurrency
 build/
 
 # Test cache and coverage
@@ -31,3 +30,6 @@ Thumbs.db
 
 # copier answers (uncomment to track template version)
 # !.copier-answers.yml
+
+# graphify local output
+graphify-out/

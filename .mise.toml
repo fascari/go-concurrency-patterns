@@ -12,6 +12,10 @@ run = "go test -race -v ./..."
 description = "Run linter"
 run = "golangci-lint run"
 
+[tasks.build]
+description = "Build the CLI into bin/"
+run = "mkdir -p bin && go build -o bin/concurrency ./cmd/concurrency"
+
 [tasks.pattern]
 description = "Run a concurrency pattern (usage: mise run pattern <name>)"
 run = "go run ./cmd/concurrency --pattern"
